@@ -1,3 +1,8 @@
+%Sun Zhicheng
+%Warning
+%first to download MNIST dataset and rename it! 
+%second i encounter overflow.......
+
 addpath ../common
 addpath ../common/minFunc_2012/minFunc
 addpath ../common/minFunc_2012/minFunc/compiled

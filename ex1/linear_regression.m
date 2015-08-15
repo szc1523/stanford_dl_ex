@@ -9,9 +9,10 @@ function [f,g] = linear_regression(theta, X,y)
   
   m=size(X,2);
   n=size(X,1);
-
-  f=0;
-  g=zeros(size(theta));
+  
+  hmy=theta'*X-y;  %hmy is h minus y
+  f=1/2*(norm(hmy)).^2;
+  g=X*hmy';
 
   %
   % TODO:  Compute the linear regression objective by looping over the examples in X.

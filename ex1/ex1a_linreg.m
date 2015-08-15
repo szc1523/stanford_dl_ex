@@ -9,6 +9,9 @@
 % ''Hedonic prices and the demand for clean air''
 % J. Environ. Economics & Management, vol.5, 81-102, 1978.
 %
+%
+clear; clc;
+
 addpath ../common
 addpath ../common/minFunc_2012/minFunc
 addpath ../common/minFunc_2012/minFunc/compiled
@@ -87,4 +90,5 @@ if (plot_prices)
   legend('Actual Price', 'Predicted Price');
   xlabel('House #');
   ylabel('House price ($1000s)');
+  hold off;
 end

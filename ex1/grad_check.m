@@ -3,7 +3,7 @@ function average_error = grad_check(fun, theta0, num_checks, varargin)
   delta=1e-3; 
   sum_error=0;
 
-  fprintf(' Iter       i             err');
+  fprintf(' Iter   index             err'); %index is j, the jth gradient;
   fprintf('           g_est               g               f\n')
 
   for i=1:num_checks
@@ -25,4 +25,4 @@ function average_error = grad_check(fun, theta0, num_checks, varargin)
     sum_error = sum_error + error;
   end
 
-  average=sum_error/num_checks;
+  average_error=sum_error/num_checks;
