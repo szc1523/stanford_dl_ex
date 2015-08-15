@@ -31,11 +31,21 @@ function [f,g] = softmax_regression_vec(theta, X,y) %original name is wrong
   hsum = sum(h);     
   h = bsxfun(@rdivide, h, hsum); %h is class by m matrix
   
+  %calculate cost
+  %method 1   faster 
   I = sub2ind(size(h), y, 1:m); %must append one to h to make this right.
   f = -sum(log(h(I)));
+  %method 2
+%   ym=full(sparse(y, 1:m, 1));  
+%   f = -sum(sum(ym.*log(h)));
   
+  %create sparse matrix, 2 methods same time
+  %method 1
   ym = zeros(num_classes,m);  %ym is y matrix
   ym(I) = 1;
+  %method 2
+%   ym=full(sparse(y, 1:m, 1));  
+  
   g = -X*(ym-h)';
   g = g(:,1:num_classes-1);
   
