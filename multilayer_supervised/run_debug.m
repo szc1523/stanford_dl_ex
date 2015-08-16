@@ -55,18 +55,27 @@ params = stack2params(stack);
 %     data_train, labels_train);
 
 %% gradient checker
-num_checks=50;
-average_error = grad_check(@supervised_dnn_cost, ...
-    params, num_checks, ei, data_train, labels_train);
+% num_checks=50;
+% average_error = grad_check(@supervised_dnn_cost, ...
+%     params, num_checks, ei, data_train, labels_train);
 
-% %% setup minfunc options
-% options = [];
-% options.display = 'iter';
-% options.maxFunEvals = 1e6;
-% options.Method = 'lbfgs';
-% 
-% %% run training
-% [opt_params,opt_value,exitflag,output] = minFunc(@supervised_dnn_cost,...
-%     params,options,ei, data_train, labels_train);
+%% setup minfunc options
+options = [];
+options.display = 'iter';
+options.maxFunEvals = 1e6;
+options.Method = 'lbfgs';
 
+%% run training
+[opt_params,opt_value,exitflag,output] = minFunc(@supervised_dnn_cost,...
+    params,options,ei, data_train, labels_train);
 
+%% compute accuracy on the test and train set
+[~, ~, pred] = supervised_dnn_cost( opt_params, ei, data_test, [], true);
+[~,pred] = max(pred);
+acc_test = mean(pred'==labels_test);
+fprintf('test accuracy: %f\n', acc_test);
+
+[~, ~, pred] = supervised_dnn_cost( opt_params, ei, data_train, [], true);
+[~,pred] = max(pred);
+acc_train = mean(pred'==labels_train);
+fprintf('train accuracy: %f\n', acc_train);

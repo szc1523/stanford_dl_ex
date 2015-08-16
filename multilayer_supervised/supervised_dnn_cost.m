@@ -47,6 +47,9 @@ end;
 
 %% compute cost
 %%% YOUR CODE HERE %%%
+% warning: there has to be a (1/m) in the cost function
+% because there is (1/m) in the gradient function,
+% two has to be same. both have or neither have.
 I = sub2ind(size(hAct{numHidden+1}), labels', 1:m); 
 cost = -(1/m)*sum(log(hAct{numHidden+1}(I)));  %softmax cost
 % for l = 1 : numHidden+1
