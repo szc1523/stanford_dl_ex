@@ -67,7 +67,7 @@ elseif Ctrl ==1
     %% hyperparameter test
     lambdam = [0 0.00001 0.00003 0.0001]; %0.00003 seems to be best
     ei.lambda = 0.00003;
-    hid_single_m = 100:50:300;
+    hid_single_m = 100:50:300; %200 seems to be best value 0.985
     
     curpara = hid_single_m; %its current para
     %record:1.para 2.test_error 3.train_error 4.time
