@@ -1,8 +1,8 @@
 function [train, test] = ex1_load_mnist(binary_digits)
 
   % Load the training data
-  X=loadMNISTImages('train-images.idx3-ubyte'); %its been revised!!!!!!!!!!!!!!!!from - to .
-  y=loadMNISTLabels('train-labels.idx1-ubyte')';
+  X=loadMNISTImages('train-images-idx3-ubyte'); %the downloaded file has been renamed to -
+  y=loadMNISTLabels('train-labels-idx1-ubyte')';
 
   if (binary_digits)
     % Take only the 0 and 1 digits
