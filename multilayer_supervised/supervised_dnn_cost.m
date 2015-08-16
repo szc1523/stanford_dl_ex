@@ -50,11 +50,12 @@ end;
 % warning: there has to be a (1/m) in the cost function
 % because there is (1/m) in the gradient function,
 % two has to be same. both have or neither have.
+% the same with (1/m) before reg terms.
 I = sub2ind(size(hAct{numHidden+1}), labels', 1:m); 
 cost = -(1/m)*sum(log(hAct{numHidden+1}(I)));  %softmax cost
-% for l = 1 : numHidden+1
-%     cost = cost + ei.lambda/2*sum(sum((stack{l}.W).^2)); % does regularization need 1/m?????
-% end
+for l = 1 : numHidden+1
+    cost = cost + ei.lambda/2*sum(sum((stack{l}.W).^2)); % does regularization need 1/m?????
+end
 
 %% compute gradients using backpropagation
 %%% YOUR CODE HERE %%%
@@ -63,23 +64,22 @@ ym = zeros(ei.output_dim,m);  %ym is y matrix
 ym(I) = 1;
 delta{numHidden+1} = hAct{numHidden+1}-ym;
 gradStack{numHidden+1}.b = (1/m)*sum(delta{numHidden+1},2);
-gradStack{numHidden+1}.W = (1/m)*delta{numHidden+1}*(hAct{numHidden})';
+gradStack{numHidden+1}.W = (1/m)*delta{numHidden+1}*(hAct{numHidden})'...
+                            +ei.lambda.*stack{numHidden+1}.W;
 % compute delta and grad of hidden layer
 for l = numHidden : -1 : 1
     %calculate delta
-    %backprop only to real neuron, not to bias
-    delta{l} = ((stack{l+1}.W)'*delta{l+1})...%UFLDL seems wrong
+    %delta only backprop to real neuron, not to bias neuron
+    delta{l} = ((stack{l+1}.W)'*delta{l+1})...  %UFLDL seems wrong
         .*(hAct{l}.*(1-hAct{l}));    
     %calculate gradient
     gradStack{l}.b = (1/m)*sum(delta{l},2);
     if l ~= 1        
-        gradStack{l}.W = (1/m)*delta{l}*(hAct{l-1})';
+        gradStack{l}.W = (1/m)*delta{l}*(hAct{l-1})'+ei.lambda.*stack{l}.W;
     else
-        gradStack{l}.W = (1/m)*delta{l}*data';
+        gradStack{l}.W = (1/m)*delta{l}*data'+ei.lambda.*stack{l}.W;
     end
 end
-
-
 
 %% compute weight penalty cost and gradient for non-bias terms
 %%% YOUR CODE HERE %%%
