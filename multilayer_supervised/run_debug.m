@@ -46,14 +46,18 @@ ei.activation_fun = 'logistic';
 stack = initialize_weights(ei);
 params = stack2params(stack);
 
-%% call nn cost function
-[ cost, grad, pred_prob] = supervised_dnn_cost( params, ei, ...
-    data_train, labels_train, true);
+%% call nn cost function to calculate probability
+% [ cost, grad, pred_prob] = supervised_dnn_cost( params, ei, ...
+%     data_train, labels_train, true);
 
+%% call nn cost function to calculate cost
+% [ cost, grad, pred_prob] = supervised_dnn_cost( params, ei, ...
+%     data_train, labels_train);
 
-
-
-
+%% gradient checker
+num_checks=50;
+average_error = grad_check(@supervised_dnn_cost, ...
+    params, num_checks, ei, data_train, labels_train);
 
 % %% setup minfunc options
 % options = [];

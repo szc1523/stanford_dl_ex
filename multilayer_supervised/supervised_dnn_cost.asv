@@ -1,4 +1,6 @@
 function [ cost, grad, pred_prob] = supervised_dnn_cost( theta, ei, data, labels, pred_only)
+%output pred_prob is prediction probability
+
 %SPNETCOSTSLAVE Slave cost function for simple phone net
 %   Does all the work of cost / gradient computation
 %   Returns cost broken into cross-entropy, weight norm, and prox reg
@@ -15,32 +17,70 @@ m = size(data,2);
 %% reshape into network
 stack = params2stack(theta, ei);
 numHidden = numel(ei.layer_sizes) - 1;
-hAct = cell(numHidden+1, 1); %what's this?????
-gradStack = cell(numHidden+1, 1);
+hAct = cell(numHidden+1, 1); %activation of hidden layer
+gradStack = cell(numHidden+1, 1); %grad of each layer
+delta = cell(numHidden+1, 1); %delta of each layer
 
 %% forward prop
 %%% YOUR CODE HERE %%%
-z2=stack{l}.W*[ones(1,m);X'];
-a2=sigmoid(z2);stack{l}.W
-z3=Theta2*[ones(1,m);a2];
-a3=sigmoid(z3);
-
+for l = 1 : numHidden+1
+    if l > 1
+        z = [stack{l}.b,stack{l}.W]*[ones(1,m);hAct{l-1}];
+    else
+        z = [stack{l}.b,stack{l}.W]*[ones(1,m);data];
+    end
+    if l ~= numHidden+1
+        hAct{l} = 1./(1+exp(-z)); %logistic
+    else 
+        h=exp(z);
+        hAct{l} = bsxfun(@rdivide, h, sum(h)); %softmax
+    end
+end
 
 %% return here if only predictions desired.
 if po
   cost = -1; ceCost = -1; wCost = -1; numCorrect = -1;
   grad = [];  
+  pred_prob = hAct{numHidden+1};  %its 10 by m matrix
   return;
 end;
 
 %% compute cost
 %%% YOUR CODE HERE %%%
+I = sub2ind(size(h), y, 1:m); 
+cost = -sum(log(h(I)));  %softmax cost
+for l = 1 : numHidden+1
+    cost = cost + ei.lambda/2*sum(sum((stack{l}.W).^2)); % does regularization need 1/m?????
+end
 
 %% compute gradients using backpropagation
 %%% YOUR CODE HERE %%%
+% compute delta and grad of output layer
+ym = zeros(num_classes,m);  %ym is y matrix
+ym(I) = 1;
+delta{numHidden+1} = hAct{numHidden+1}-ym;
+gradStack{numHidden+1}.b = sum(delta{numHidden+1},2);
+gradStack{numHidden+1}.W = delta*(hAct{numHidden})';
+% compute delta and grad of hidden layer
+for l = numHidden : -1 : 1
+    %calculate delta
+    %backprop only to real neuron, not to bias
+    delta{l} = ([stack{l}.W]'*delta(l+1))...
+        .*(hAct(l).*(1-hAct(l)));    
+    %calculate gradient
+    gradStack{l}.b = sum(delta{l},2);
+    if l ~= 1        
+        gradStack{l}.W = hAct{l-1}* (delta{l})';
+    else
+        gradStack{l}.W = data* (delta{l})';
+    end
+end
+
+
 
 %% compute weight penalty cost and gradient for non-bias terms
 %%% YOUR CODE HERE %%%
+% its in the cost term
 
 %% reshape gradients into vector
 [grad] = stack2params(gradStack);

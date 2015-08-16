@@ -4,7 +4,9 @@
 % softmax output layer with cross entropy loss function
 
 %% setup environment
+%clear environment
 clear;clc; close all;
+
 % experiment information
 % a struct containing network layer sizes etc
 ei = [];
@@ -16,11 +18,11 @@ addpath(genpath('../common/minFunc_2012/minFunc'));
 
 %% load mnist data
 [data_train, labels_train, data_test, labels_test] = load_preprocess_mnist();
-%decrease the number of examples for debug
-data_train= data_train(:,1:100);
-labels_train= labels_train(:,1:100);
-data_train= data_train(:,1:100);
-data_train= data_train(:,1:100);
+%decrease the number of examples for debug use
+data_train = data_train(:,1:1000);
+labels_train = labels_train(1:1000);
+data_test = data_test(:,1:1000);
+labels_test = labels_test(1:1000);
 
 %% populate ei with the network architecture to train
 % ei is a structure you can use to store hyperparameters of the network
@@ -44,11 +46,13 @@ ei.activation_fun = 'logistic';
 stack = initialize_weights(ei);
 params = stack2params(stack);
 
-%% call nn cost function
-[ cost, grad] = supervised_dnn_cost( params, ei, ...
-    data_train, labels_train);
+%% call nn cost function to calculate probability
+[ cost, grad, pred_prob] = supervised_dnn_cost( params, ei, ...
+    data_train, labels_train, true);
 
-
+%% call nn cost function to 
+[ cost, grad, pred_prob] = supervised_dnn_cost( params, ei, ...
+    data_train, labels_train, true);
 
 
 
