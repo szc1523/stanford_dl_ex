@@ -19,10 +19,10 @@ addpath(genpath('../common/minFunc_2012/minFunc'));
 %% load mnist data
 [data_train, labels_train, data_test, labels_test] = load_preprocess_mnist();
 %decrease the number of examples for debug use
-data_train = data_train(:,1:1000);
-labels_train = labels_train(1:1000);
-data_test = data_test(:,1:1000);
-labels_test = labels_test(1:1000);
+% data_train = data_train(:,1:1000);
+% labels_train = labels_train(1:1000);
+% data_test = data_test(:,1:1000);
+% labels_test = labels_test(1:1000);
 
 %% populate ei with the network architecture to train
 % ei is a structure you can use to store hyperparameters of the network
@@ -35,9 +35,9 @@ ei.input_dim = 784;
 % number of output classes
 ei.output_dim = 10;
 % sizes of all hidden layers and the output layer
-ei.layer_sizes = [15, ei.output_dim];
+ei.layer_sizes = [100, ei.output_dim];
 % scaling parameter for l2 weight regularization penalty
-ei.lambda = 0.002;
+ei.lambda = 0.00003;
 % which type of activation function to use in hidden layers
 % feel free to implement support for only the logistic sigmoid function
 ei.activation_fun = 'logistic';
@@ -50,32 +50,32 @@ params = stack2params(stack);
 % [ cost, grad, pred_prob] = supervised_dnn_cost( params, ei, ...
 %     data_train, labels_train, true);
 
-%% call nn cost function to calculate cost
-% [ cost, grad, pred_prob] = supervised_dnn_cost( params, ei, ...
-%     data_train, labels_train);
+% call nn cost function to calculate cost
+[ cost, grad, pred_prob] = supervised_dnn_cost( params, ei, ...
+    data_train, labels_train);
 
 %% gradient checker
-num_checks=50;
-average_error = grad_check(@supervised_dnn_cost, ...
-    params, num_checks, ei, data_train, labels_train);
+% num_checks=50;
+% average_error = grad_check(@supervised_dnn_cost, ...
+%     params, num_checks, ei, data_train, labels_train);
 
-% %% setup minfunc options
-% options = [];
-% options.display = 'iter';
-% options.maxFunEvals = 1e6;
-% options.Method = 'lbfgs';
-% 
-% %% run training
-% [opt_params,opt_value,exitflag,output] = minFunc(@supervised_dnn_cost,...
-%     params,options,ei, data_train, labels_train);
-% 
-% %% compute accuracy on the test and train set
-% [~, ~, pred] = supervised_dnn_cost( opt_params, ei, data_test, [], true);
-% [~,pred] = max(pred);
-% acc_test = mean(pred'==labels_test);
-% fprintf('test accuracy: %f\n', acc_test);
-% 
-% [~, ~, pred] = supervised_dnn_cost( opt_params, ei, data_train, [], true);
-% [~,pred] = max(pred);
-% acc_train = mean(pred'==labels_train);
-% fprintf('train accuracy: %f\n', acc_train);
+%% setup minfunc options
+options = [];
+options.display = 'iter';
+options.maxFunEvals = 1e6;
+options.Method = 'lbfgs';
+
+%% run training
+[opt_params,opt_value,exitflag,output] = minFunc(@supervised_dnn_cost,...
+    params,options,ei, data_train, labels_train);
+
+%% compute accuracy on the test and train set
+[~, ~, pred] = supervised_dnn_cost( opt_params, ei, data_test, [], true);
+[~,pred] = max(pred);
+acc_test = mean(pred'==labels_test);
+fprintf('test accuracy: %f\n', acc_test);
+
+[~, ~, pred] = supervised_dnn_cost( opt_params, ei, data_train, [], true);
+[~,pred] = max(pred);
+acc_train = mean(pred'==labels_train);
+fprintf('train accuracy: %f\n', acc_train);

@@ -68,6 +68,7 @@ elseif Ctrl ==1
     lambdam = [0 0.00001 0.00003 0.0001]; %0.00003 seems to be best
     ei.lambda = 0.00003;
     hid_single_m = 100:50:300;
+    
     curpara = hid_single_m; %its current para
     %record:1.para 2.test_error 3.train_error 4.time
     result = zeros(length(curpara), 4);
@@ -75,6 +76,8 @@ elseif Ctrl ==1
     
     for i = 1:length(curpara)
         ei.layer_sizes(1) = curpara(i);
+        stack = initialize_weights(ei);
+        params = stack2params(stack);
         tic;
         [opt_params,opt_value,exitflag,output] = minFunc(@supervised_dnn_cost,...
             params,options,ei, data_train, labels_train);
