@@ -5,9 +5,9 @@ function [ cost, grad, pred_prob] = supervised_dnn_cost( theta, ei, data, labels
 %        components (ceCost, wCost, pCost)
 
 %% default values
-po = false;
+po = false; %means prediction only
 if exist('pred_only','var')
-  po = pred_only;
+  po = pred_only;   %if pred_only is true, only feedforward
 end;
 
 %% reshape into network
