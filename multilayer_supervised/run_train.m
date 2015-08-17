@@ -141,8 +141,8 @@ elseif Ctrl ==2
     %disp(result_test);
 elseif Ctrl ==3
     %% many hyperparameter test -3 
-    hid1 = 200:50:500; %250 50 seems to be best
-    hid2 = [10 20 40 60];
+    hid1 = 200:50:500; 
+    hid2 = [10 20 40 60]; %seem 350,40 to be best
     ei.lambda = 0.00003;
     
     %record:1.para 2.test_error 3.train_error

@@ -88,9 +88,9 @@ activationsPooled = reshape(activationsPooled,[],numImages);
 % numClasses x numImages for storing probability that each image belongs to
 % each class.
 probs = zeros(numClasses,numImages);
+
 %%% YOUR CODE HERE %%%
-
-
+\
 
 %%======================================================================
 %% STEP 1b: Calculate Cost
