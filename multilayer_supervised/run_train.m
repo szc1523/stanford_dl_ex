@@ -4,6 +4,7 @@
 %% setup environment
 % experiment information
 % a struct containing network layer sizes etc
+clear;clc;close all;
 ei = [];
 Ctrl = 3; %0 train; 1. hyperparameter 2. many hyperpara-2 3.many hyperpara-3
 
@@ -145,7 +146,7 @@ elseif Ctrl ==3
     ei.lambda = 0.00003;
     
     %record:1.para 2.test_error 3.train_error
-    re = 0; %result struct
+    re = []; %result struct
     re.hy1.name = 'hidden layer 1 neuron number';
     re.hy1.value = hid1;
     re.hy2.name = 'hidden layer 2 neuron number';
@@ -174,7 +175,7 @@ elseif Ctrl ==3
             re.train(i,j)=acc_train;
         end
     end
-    disp(result_test);    
+    %disp(result_test);    
 end
 
 

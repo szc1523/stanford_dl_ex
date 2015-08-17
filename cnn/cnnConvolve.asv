@@ -39,8 +39,8 @@ convolvedFeatures = zeros(convDim, convDim, numFilters, numImages);
 for imageNum = 1:numImages
   for filterNum = 1:numFilters    
     % convolution of image with feature matrix -its the image after convolve
-    % but preallocation is not recommended by Matlab, so its commented
-    % convolvedImage = zeros(convDim, convDim);
+    
+    convolvedImage = zeros(convDim, convDim);
 
     % Obtain the feature (filterDim x filterDim) needed during the convolution
     %%% YOUR CODE HERE %%%
@@ -55,13 +55,12 @@ for imageNum = 1:numImages
     % Convolve "filter" with "im", adding the result to convolvedImage
     % be sure to do a 'valid' convolution    
     %%% YOUR CODE HERE %%%
-    convolvedImage = conv2(im, filter, 'valid');
+    convolvedImage = conv2(im, filter);
     
     % Add the bias unit
     % Then, apply the sigmoid function to get the hidden activation
     %%% YOUR CODE HERE %%%
-    convolvedImage = convolvedImage + b(filterNum);
-    convolvedImage = 1./(1+exp(-convolvedImage));
+    convolvedImage = convolvedImage + b(numFilters);
     
     convolvedFeatures(:, :, filterNum, imageNum) = convolvedImage;
   end

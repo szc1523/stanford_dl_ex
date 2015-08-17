@@ -31,18 +31,30 @@ pooledFeatures = zeros(convolvedDim / poolDim, ...
 
 %%% YOUR CODE HERE %%%
 
-filter = ones(poolDim, poolDim)/poolDim/poolDim;
-
 for imageNum = 1:numImages
   for filterNum = 1:numFilters    
-    % Obtain the convolvedFeatures
-    cf = squeeze(convolvedFeatures(:, :, filterNum, imageNum));
+    % Obtain the feature (filterDim x filterDim) needed during the convolution
+    %%% YOUR CODE HERE %%%
+    filter=W(:,:,filterNum);
 
-    % Convolve "filter" with "cf"
-    % I haven't found faster implementation, there should be
-    Temp = conv2(cf, filter, 'valid');
-    pooledFeatures(:, :, filterNum, imageNum) = ...
-      Temp(1:poolDim:end, 1:poolDim:end);
+    % Flip the feature matrix because of the definition of convolution, as explained later
+    filter = rot90(squeeze(filter),2);
+      
+    % Obtain the image
+    im = squeeze(images(:, :, imageNum));
+
+    % Convolve "filter" with "im", adding the result to convolvedImage
+    % be sure to do a 'valid' convolution    
+    %%% YOUR CODE HERE %%%
+    convolvedImage = conv2(im, filter, 'valid');
+    
+    % Add the bias unit
+    % Then, apply the sigmoid function to get the hidden activation
+    %%% YOUR CODE HERE %%%
+    convolvedImage = convolvedImage + b(filterNum);
+    convolvedImage = 1./(1+exp(-convolvedImage));
+    
+    convolvedFeatures(:, :, filterNum, imageNum) = convolvedImage;
   end
 end
 
