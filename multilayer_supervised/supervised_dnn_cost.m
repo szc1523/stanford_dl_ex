@@ -32,7 +32,7 @@ for l = 1 : numHidden+1
     if l ~= numHidden+1
         hAct{l} = 1./(1+exp(-z)); %logistic
     else 
-        h=exp(z);
+        h = exp(z);
         hAct{l} = bsxfun(@rdivide, h, sum(h)); %softmax
         pred_prob = hAct{l}; %its 10 by m matrix, the output prediction
     end
@@ -70,7 +70,7 @@ gradStack{numHidden+1}.W = (1/m)*delta{numHidden+1}*(hAct{numHidden})'...
 for l = numHidden : -1 : 1
     %calculate delta
     %delta only backprop to real neuron, not to bias neuron
-    delta{l} = ((stack{l+1}.W)'*delta{l+1})...  %UFLDL seems wrong
+    delta{l} = ((stack{l+1}.W)'*delta{l+1})...  %UFLDL use different notation
         .*(hAct{l}.*(1-hAct{l}));    
     %calculate gradient
     gradStack{l}.b = (1/m)*sum(delta{l},2);

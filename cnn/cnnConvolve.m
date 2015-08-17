@@ -36,15 +36,15 @@ convolvedFeatures = zeros(convDim, convDim, numFilters, numImages);
 %   described earlier)
 
 
-for imageNum = 1:numImages
-  for filterNum = 1:numFilters    
+for imageNum = 1: numImages
+  for filterNum = 1: numFilters    
     % convolution of image with feature matrix -its the image after convolve
     % but preallocation is not recommended by Matlab, so its commented
     % convolvedImage = zeros(convDim, convDim);
 
     % Obtain the feature (filterDim x filterDim) needed during the convolution
     %%% YOUR CODE HERE %%%
-    filter=W(:,:,filterNum);
+    filter = W(:,:,filterNum);
 
     % Flip the feature matrix because of the definition of convolution, as explained later
     filter = rot90(squeeze(filter),2);

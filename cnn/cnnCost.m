@@ -70,9 +70,7 @@ outputDim = (convDim)/poolDim; % dimension of subsampled output
 %activationsPooled = zeros(outputDim,outputDim,numFilters,numImages);
 
 %%% YOUR CODE HERE %%%
-W(:,:,1) = Wc;   %reshape W
-W(:,:,2) = Wd;
-activations = cnnConvolve(filterDim, numFilters, images, W, [bc; bd]);
+activations = cnnConvolve(filterDim, numFilters, images, Wc, bc);
 activationsPooled = cnnPool(poolDim, activations);
 
 % Reshape activations into 2-d matrix, hiddenSize x numImages,
@@ -87,9 +85,12 @@ activationsPooled = reshape(activationsPooled,[],numImages);
 
 % numClasses x numImages for storing probability that each image belongs to
 % each class.
-probs = zeros(numClasses,numImages);
-%%% YOUR CODE HERE %%%
+%probs = zeros(numClasses,numImages);
 
+%%% YOUR CODE HERE %%%
+z = [bd, Wd]*[ones(1,numImages);activationsPooled];
+h = exp(z);
+probs = bsxfun(@rdivide, h, sum(h));
 
 
 %%======================================================================
@@ -99,8 +100,10 @@ probs = zeros(numClasses,numImages);
 %  results in cost.
 
 cost = 0; % save objective into cost
-
 %%% YOUR CODE HERE %%%
+% no lambda as input, so no regulariztion?
+I = sub2ind(size(probs), labels', 1:numImages); 
+cost = -(1/numImages)*sum(log(probs(I)));  %softmax cost
 
 % Makes predictions given probs and returns without backproagating errors.
 if pred
@@ -119,8 +122,38 @@ end;
 %  error with respect to the pooling layer for each filter and each image.  
 %  Use the kron function and a matrix of ones to do this upsampling 
 %  quickly.
-
 %%% YOUR CODE HERE %%%
+
+% softmax backprop 
+ym = zeros(numClasses, numImages);  %ym is y matrix(ground truth)
+ym(I) = 1;
+delta = cell(2,1);   %this definition do not generalize
+delta{2} = probs - ym;
+% pay attention to the dimention
+delta{1} = zeros(convDim, convDim, numFilters, numImages); 
+
+
+% convolutional backprop
+% propagate to pooling layer
+delta_pool = reshape(Wd'*delta{2}, outputDim, outputDim, ...
+  numFilters, numImages);  
+
+% propagate to convolutional layer through pooling layer
+% Upsample the incoming error using kron
+for imageNum = 1: numImages
+  for filterNum = 1: numFilters    
+    % delta{1} differs from all the other deltas because it gives an
+    % example to operate one at a time, other deltas use vectorization to
+    % compute all examples in one multiplication
+    data_pool_t = squeeze(delta_pool(:, :, filterNum, imageNum));
+    delta{1}(:, :, filterNum, imageNum) = (1/poolDim^2) *...   
+      kron(data_pool_t, ones(poolDim));  
+    delta{1}(:, :, filterNum, imageNum) = delta{1}(:, :, filterNum, imageNum)...
+      .* activations(:, :, filterNum, imageNum) .* ...
+      (1 - activations(:, :, filterNum, imageNum));    
+  end
+end
+
 
 %%======================================================================
 %% STEP 1d: Gradient Calculation
@@ -129,8 +162,35 @@ end;
 %  softmax layer is calculated as usual.  To calculate the gradient w.r.t.
 %  a filter in the convolutional layer, convolve the backpropagated error
 %  for that filter with each image and aggregate over images.
-
 %%% YOUR CODE HERE %%%
+
+% softmax gradient
+bd_grad = (1/numImages) * sum(delta{2}, 2);
+Wd_grad = (1/numImages) * delta{2} * (activationsPooled)';
+
+% compute conv layer gradient
+for filterNum = 1: numFilters
+  % initial Wc_grad_t  
+  Wc_grad_t = zeros(filterDim, filterDim);
+  for imageNum = 1: numImages  
+    % obtain the delta
+    delta_t = delta{1}(:, :, filterNum, imageNum);
+    % flip delta
+    delta_t = rot90(squeeze(delta_t), 2);
+    % obtain the image
+    im = squeeze(images(:, :, imageNum));
+    % Convolve "filter" with "im"
+    Wc_grad_t = Wc_grad_t + conv2(im, delta_t, 'valid');  
+  end
+  Wc_grad(:, :, filterNum) = (1 / numImages) * Wc_grad_t;
+  
+  % bc is a filterNum by 1 vector
+  % pay attention to the trick of sum
+  bc_grad_t = squeeze(sum(delta{1}(:, :, filterNum, :)));
+  bc_grad_t = sum(sum(bc_grad_t));
+  bc_grad(filterNum) = (1 / numImages) * bc_grad_t;
+end
+
 
 %% Unroll gradient into grad vector for minFunc
 grad = [Wc_grad(:) ; Wd_grad(:) ; bc_grad(:) ; bd_grad(:)];
