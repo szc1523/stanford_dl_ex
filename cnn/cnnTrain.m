@@ -11,7 +11,7 @@
 %%======================================================================
 %% STEP 0: Initialize Parameters and Load Data
 %  Here we initialize some parameters used for the exercise.
-
+clear;clc;
 % Configuration
 imageDim = 28;
 numClasses = 10;  % Number of classes (MNIST images fall into 10 classes)
@@ -40,7 +40,7 @@ theta = cnnInitParams(imageDim,filterDim,numFilters,poolDim,numClasses);
 %  appropriate path or copy the file to this directory.
 
 DEBUG=false;  % set this to true to check gradient
-DEBUG=true; 
+%DEBUG=true; 
 if DEBUG
     % To speed up gradient checking, we will use a reduced network and
     % a debugging data set
@@ -78,13 +78,15 @@ end;
 %% STEP 3: Learn Parameters
 %  Implement minFuncSGD.m, then train the model.
 
-options.epochs = 3;
+options.epochs = 4; % default 3
 options.minibatch = 256;
 options.alpha = 1e-1;
-options.momentum = .95;
+options.momentum = 0.95; %default .95
 
+tic;
 opttheta = minFuncSGD(@(x,y,z) cnnCost(x,y,z,numClasses,filterDim,...
                       numFilters,poolDim),theta,images,labels,options);
+a = toc;
 
 %%======================================================================
 %% STEP 4: Test
