@@ -30,8 +30,7 @@ x = bsxfun(@minus, x, avg);
 sigma = x * x' ./ m;
 [U,S,V] = svd(sigma);
 xRot = U' * x;          % rotated version of the data. 
-%xTilde = U(:,1:k)' * x; % reduced dimension representation of the data, 
-                        % where k is the number of eigenvectors to keep
+
 
 %%================================================================
 %% Step 1b: Check your implementation of PCA
@@ -42,12 +41,13 @@ xRot = U' * x;          % rotated version of the data.
 %  When visualised as an image, you should see a straight line across the
 %  diagonal (non-zero entries) against a blue background (zero entries).
 %%% YOUR CODE HERE %%%
-covar = xRot * xRot' ./ m;
 
-% Visualise the covariance matrix. You should see a line across the
-% diagonal against a blue background.
-figure('name','Visualisation of covariance matrix');
-imagesc(covar);
+% covar = xRot * xRot' ./ m;
+% 
+% % Visualise the covariance matrix. You should see a line across the
+% % diagonal against a blue background.
+% figure('name','Visualisation of covariance matrix');
+% imagesc(covar);
 
 %%================================================================
 %% Step 2: Find k, the number of components to retain
@@ -56,10 +56,11 @@ imagesc(covar);
 
 %%% YOUR CODE HERE %%%
 trS = trace(S);
+Precision = 0.9;
 t = 0; % temp
 for k = 1: size(x, 1)
-  t = t + Sk(k, k)/trS;
-  if t > 0.99
+  t = t + S(k, k)/trS;
+  if t > Precision
     break;
   end
 end
@@ -86,18 +87,25 @@ end
 % For comparison, you may wish to generate a PCA reduced image which
 % retains only 90% of the variance.
 
+xTilde = U(:,1:k)' * x; % reduced dimension representation of the data, 
+                        % where k is the number of eigenvectors to keep
+xHat = U(:,1:k) * xTilde;  % must project xTilde to the original coodinates
+
+x_ori = bsxfun(@plus, x, avg);
+xHat_ori = bsxfun(@plus, xHat, avg); 
+
 figure('name',['PCA processed images ',sprintf('(%d / %d dimensions)', k, size(x, 1)),'']);
-display_network(xHat(:,randsel));
-figure('name','Raw images');
-display_network(x(:,randsel));
+display_network(xHat_ori(:,randsel));
 
 %%================================================================
 %% Step 4a: Implement PCA with whitening and regularisation
 %  Implement PCA with whitening and regularisation to produce the matrix
 %  xPCAWhite. 
 
-epsilon = 1e-1; 
+epsilon = 1e-0; 
 %%% YOUR CODE HERE %%%
+xPCAwhite = diag(1./sqrt(diag(S) + epsilon)) * U' * x;
+covar = xPCAwhite * xPCAwhite' ./ m;
 
 %% Step 4b: Check your implementation of PCA whitening 
 %  Check your implementation of PCA whitening with and without regularisation. 
@@ -128,10 +136,12 @@ imagesc(covar);
 %  that whitening results in, among other things, enhanced edges.
 
 %%% YOUR CODE HERE %%%
+xZCAWhite = U * diag(1./sqrt(diag(S) + epsilon)) * U' * x;
+xZCAWhite = bsxfun(@plus, xZCAWhite, avg); 
 
 % Visualise the data, and compare it to the raw data.
 % You should observe that the whitened images have enhanced edges.
 figure('name','ZCA whitened images');
 display_network(xZCAWhite(:,randsel));
-figure('name','Raw images');
-display_network(x(:,randsel));
+% figure('name','Raw images');
+% display_network(x_ori(:,randsel));

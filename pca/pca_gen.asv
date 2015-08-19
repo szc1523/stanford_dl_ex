@@ -30,8 +30,7 @@ x = bsxfun(@minus, x, avg);
 sigma = x * x' ./ m;
 [U,S,V] = svd(sigma);
 xRot = U' * x;          % rotated version of the data. 
-%xTilde = U(:,1:k)' * x; % reduced dimension representation of the data, 
-                        % where k is the number of eigenvectors to keep
+
 
 %%================================================================
 %% Step 1b: Check your implementation of PCA
@@ -42,12 +41,13 @@ xRot = U' * x;          % rotated version of the data.
 %  When visualised as an image, you should see a straight line across the
 %  diagonal (non-zero entries) against a blue background (zero entries).
 %%% YOUR CODE HERE %%%
-covar = xRot * xRot' ./ m;
 
-% Visualise the covariance matrix. You should see a line across the
-% diagonal against a blue background.
-figure('name','Visualisation of covariance matrix');
-imagesc(covar);
+% covar = xRot * xRot' ./ m;
+% 
+% % Visualise the covariance matrix. You should see a line across the
+% % diagonal against a blue background.
+% figure('name','Visualisation of covariance matrix');
+% imagesc(covar);
 
 %%================================================================
 %% Step 2: Find k, the number of components to retain
@@ -56,12 +56,14 @@ imagesc(covar);
 
 %%% YOUR CODE HERE %%%
 trS = trace(S);
-t = 0
-for i = 1: size(x, 1)
-  t = 
-  if S(i, i)/trS
+Precision = 0.99;
+t = 0; % temp
+for k = 1: size(x, 1)
+  t = t + S(k, k)/trS;
+  if t > Precision
+    break;
+  end
 end
-
 
 
 %%================================================================
@@ -85,6 +87,8 @@ end
 % For comparison, you may wish to generate a PCA reduced image which
 % retains only 90% of the variance.
 
+xTilde = U(:,1:k)' * x; % reduced dimension representation of the data, 
+                        % where k is the number of eigenvectors to keep
 figure('name',['PCA processed images ',sprintf('(%d / %d dimensions)', k, size(x, 1)),'']);
 display_network(xHat(:,randsel));
 figure('name','Raw images');
