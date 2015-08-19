@@ -1,7 +1,9 @@
 %% We will use minFunc for this exercise, but you can use your
 % own optimizer of choice
-clear all;
+clear; clc; close all;
 addpath(genpath('../common/')) % path to minfunc
+set(0,'DefaultFigureWindowStyle','docked');
+
 %% These parameters should give you sane results. We recommend experimenting
 % with these values after you have a working solution.
 global params;
@@ -23,8 +25,13 @@ data = loadMNISTImages('../common/train-images-idx3-ubyte');
 
 % Step 1) Sample patches
 patches = samplePatches(data,params.patchWidth,params.m);
+randsel = randi(size(patches,2),200,1); % A random selection of samples for visualization
+display_network(patches(:,randsel));
+
 % Step 2) Apply ZCA
 patches = zca2(patches);
+figure
+display_network(patches(:,randsel));
 % Step 3) Normalize each patch. Each patch should be normalized as
 % x / ||x||_2 where x is the vector representation of the patch
 m = sqrt(sum(patches.^2) + (1e-8));
@@ -42,9 +49,18 @@ randTheta = randn(params.numFeatures,params.n)*0.01; % 1/sqrt(params.n);
 randTheta = randTheta ./ repmat(sqrt(sum(randTheta.^2,2)), 1, size(randTheta,2));
 randTheta = randTheta(:);
 
+% debug
+debug = 0;
+if debug
+  num_checks = 50;
+  grad_check( @(theta) softICACost(theta, x, params), randTheta, num_checks); % Use x or xw
+end
+
 % optimize
+figure
 [opttheta, cost, exitflag] = minFunc( @(theta) softICACost(theta, x, params), randTheta, options); % Use x or xw
 
 % display result
 W = reshape(opttheta, params.numFeatures, params.n);
+figure
 display_network(W');
