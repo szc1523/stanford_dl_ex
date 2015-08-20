@@ -60,13 +60,12 @@ for imageNum = 1:numImages
     
     % Then, apply square-square-root pooling on "resp" to get the hidden
     % activation "act"
-    %act = zeros(convDim / poolDim, convDim / poolDim); % You should replace this
-    
+    act = zeros(convDim / poolDim, convDim / poolDim); % You should replace this
     %%% YOUR CODE HERE %%%
-    resp = resp.^2;
-    Temp = conv2(resp, poolMat, 'valid');
-    act = Temp(1:poolDim:end, 1:poolDim:end);
-    act = sqrt(act + params.epsilon);
+    cf = squeeze(resp(:, :, filterNum, imageNum));
+    Temp = conv2(cf, poolMat, 'valid');
+    act(:, :, filterNum, imageNum) = ...
+      Temp(1:poolDim:end, 1:poolDim:end);    
     
     features(:, :, filterNum, imageNum) = act;
   end

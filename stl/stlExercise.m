@@ -81,7 +81,7 @@ patches = samplePatches([unlabeledData,trainData],params.patchWidth,200000);
 options.Method = 'lbfgs';  %'lbfgs'
 options.MaxFunEvals = Inf;
 options.optTol = 1e-7;
-options.MaxIter = 1000;
+options.MaxIter = 2000;
 options.outputFcn = @showBases;
 
 % You'll need to replace this line with RICA training code
@@ -93,7 +93,7 @@ options.outputFcn = @showBases;
 %%% YOUR CODE HERE %%%
 
 % Apply ZCA
-patches = zca2(patches);
+[patches, V]= zca2(patches);
 
 % normalize
 m = sqrt(sum(patches.^2) + (1e-8));  
@@ -113,6 +113,8 @@ display_network(W');
 % pre-multiply the weights with whitening matrix, equivalent to whitening
 % each image patch before applying convolution. V should be the same V
 % returned by the zca2 when you whiten the patches.
+
+% what's V ?????????????????????????????????????????????????????????????????????????????????????????
 W = W*V;
 %  reshape RICA weights to be convolutional weights.
 W = reshape(W, params.numFeatures, params.patchWidth, params.patchWidth);
@@ -132,6 +134,7 @@ testAct = feedfowardRICA(filterDim, poolDim, numFilters, testImages, W);
 featureSize = size(trainAct,1)*size(trainAct,2)*size(trainAct,3);
 trainFeatures = reshape(trainAct, featureSize, size(trainData, 2));
 testFeatures = reshape(testAct, featureSize, size(testData, 2));
+
 %% ======================================================================
 %% STEP 4: Train the softmax classifier
 
@@ -150,7 +153,11 @@ options.MaxIter = 300;
 
 % optimize
 %%% YOUR CODE HERE %%%
-
+theta(:) = minFunc(@softmax_regression_vec, randTheta2, options, ...
+  trainFeatures, trainLabels);
+theta=[theta, zeros(n,1)]; % expand theta to include the last class.
+[~,train_pred] = max(theta'*trainFeatures, [], 1);
+[~,pred] = max(theta'*testFeatures, [], 1);
 
 %%======================================================================
 %% STEP 5: Testing 
