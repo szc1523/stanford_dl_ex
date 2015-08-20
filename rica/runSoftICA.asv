@@ -36,11 +36,13 @@ display_network(patches(:,randsel));
 % Step 3) Normalize each patch. Each patch should be normalized as
 % x / ||x||_2 where x is the vector representation of the patch
 
-% This normalization make rica tend to premature converge and learn 
-% nothing useful. must change the  optTol of minFun to make it converge correctly!!!!!!!!
-% a reasonale tolerance would be 1e-6 to 1e-7
+% This normalization make rica tend to pre
 m = sqrt(sum(patches.^2) + (1e-8));  
 x = bsxfunwrap(@rdivide,patches,m);
+
+%if i use the normalization code above, the minFun will converge quickly, 
+% with optTol 1e-5 and learn nothing meaningful.... its weird!!
+%x = patches;
 
 %% Run the optimization
 options.Method = 'lbfgs';  %'lbfgs'

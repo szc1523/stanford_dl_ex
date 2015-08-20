@@ -12,6 +12,8 @@
 %  STEP 0: Here we provide the relevant parameters values that will
 %  allow your RICA to get good filters; you do not need to 
 %  change the parameters below.
+clear; clc; close all;
+set(0,'DefaultFigureWindowStyle','docked');
 addpath(genpath('..'))
 imgSize = 28;
 global params;
@@ -76,16 +78,30 @@ randTheta = randTheta(:);
 patches = samplePatches([unlabeledData,trainData],params.patchWidth,200000);
 
 %configure minFunc
-options.Method = 'lbfgs';
+options.Method = 'lbfgs';  %'lbfgs'
 options.MaxFunEvals = Inf;
+options.optTol = 1e-7;
 options.MaxIter = 1000;
+options.outputFcn = @showBases;
+
 % You'll need to replace this line with RICA training code
-opttheta = randTheta;
+% opttheta = randTheta;
 
 %  Find opttheta by running the RICA on all the training patches.
 %  You will need to whitened the patches with the zca2 function 
 %  then call minFunc with the softICACost function as seen in the RICA exercise.
 %%% YOUR CODE HERE %%%
+
+% Apply ZCA
+patches = zca2(patches);
+
+% normalize
+m = sqrt(sum(patches.^2) + (1e-8));  
+x = bsxfunwrap(@rdivide,patches,m);
+
+% optimize
+[opttheta, cost, exitflag] = minFunc( ...
+  @(theta) softICACost(theta, x, params), randTheta, options);
 
 % reshape visualize weights
 W = reshape(opttheta, params.numFeatures, params.n);
