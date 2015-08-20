@@ -81,7 +81,7 @@ patches = samplePatches([unlabeledData,trainData],params.patchWidth,200000);
 options.Method = 'lbfgs';  %'lbfgs'
 options.MaxFunEvals = Inf;
 options.optTol = 1e-7;
-options.MaxIter = 1000;
+options.MaxIter = 2000;
 options.outputFcn = @showBases;
 
 % You'll need to replace this line with RICA training code
@@ -159,11 +159,8 @@ options.outputFcn = []; %have to do that!!!! or minFun will report error
 
 opttheta = reshape(opttheta, numClasses, featureSize);
 
-[~, ~, train_pred] = softmaxcost(opttheta, trainFeatures, ...
-  trainLabels, 1);
-[~, ~, test_pred] = softmaxcost(opttheta, testFeatures, ...
-  testLabels, 1);
-
+[~,train_pred] = max(opttheta*trainFeatures, [], 1);
+[~,pred] = max(opttheta*testFeatures, [], 1);
 
 %%======================================================================
 %% STEP 5: Testing 
@@ -172,7 +169,7 @@ opttheta = reshape(opttheta, numClasses, featureSize);
 %%% YOUR CODE HERE %%%
 % Classification Score
 fprintf('Train Accuracy: %f%%\n', 100*mean(train_pred(:) == trainLabels(:)));
-fprintf('Test Accuracy: %f%%\n', 100*mean(test_pred(:) == testLabels(:)));
+fprintf('Test Accuracy: %f%%\n', 100*mean(pred(:) == testLabels(:)));
 % You should get 100% train accuracy and ~99% test accuracy. With random
 % convolutional weights we get 97.5% test accuracy. Actual results may
 % vary as a result of random initializations
