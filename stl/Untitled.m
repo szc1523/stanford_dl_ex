@@ -12,13 +12,18 @@ randTheta2 = randTheta2(:);
 options.Method = 'lbfgs';
 options.MaxFunEvals = Inf;
 options.MaxIter = 300;
+options.outputFcn = [];
 
 % optimize
 %%% YOUR CODE HERE %%%
-theta(:) = derivativeCheck(@softmaxcost, randTheta2, 1, 1, ...
+% theta(:) = derivativeCheck(@softmaxcost, randTheta2, 1, 1, ...
+%   trainFeatures, trainLabels);
+
+[opttheta, cost, exitflag] = minFunc(@softmaxcost, randTheta2, options, ...
   trainFeatures, trainLabels);
 
+opttheta = reshape(opttheta, numClasses, featureSize);
 
-% theta=[theta, zeros(n,1)]; % expand theta to include the last class.
-% [~,train_pred] = max(theta'*trainFeatures, [], 1);
-% [~,pred] = max(theta'*testFeatures, [], 1);
+[~,train_pred] = max(opttheta*trainFeatures, [], 1);
+[~,pred] = max(opttheta*testFeatures, [], 1);
+

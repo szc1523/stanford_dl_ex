@@ -150,14 +150,17 @@ randTheta2 = randTheta2(:);
 options.Method = 'lbfgs';
 options.MaxFunEvals = Inf;
 options.MaxIter = 300;
+options.outputFcn = [];
 
 % optimize
 %%% YOUR CODE HERE %%%
-theta(:) = minFunc(@softmax_regression_vec, randTheta2, options, ...
+[opttheta, cost, exitflag] = minFunc(@softmaxcost, randTheta2, options, ...
   trainFeatures, trainLabels);
-theta=[theta, zeros(n,1)]; % expand theta to include the last class.
-[~,train_pred] = max(theta'*trainFeatures, [], 1);
-[~,pred] = max(theta'*testFeatures, [], 1);
+
+opttheta = reshape(opttheta, numClasses, featureSize);
+
+[~,train_pred] = max(opttheta*trainFeatures, [], 1);
+[~,pred] = max(opttheta*testFeatures, [], 1);
 
 %%======================================================================
 %% STEP 5: Testing 
